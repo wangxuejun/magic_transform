@@ -155,6 +155,11 @@
       <version>1.5.22</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-java</artifactId>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -178,20 +183,6 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <skipTests>true</skipTests>
-        </configuration>
-      </plugin>
-      <!-- 避免font文件的二进制文件格式压缩破坏 -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <configuration>
-          <nonFilteredFileExtensions>
-            <nonFilteredFileExtension>woff</nonFilteredFileExtension>
-            <nonFilteredFileExtension>woff2</nonFilteredFileExtension>
-            <nonFilteredFileExtension>eot</nonFilteredFileExtension>
-            <nonFilteredFileExtension>ttf</nonFilteredFileExtension>
-            <nonFilteredFileExtension>svg</nonFilteredFileExtension>
-          </nonFilteredFileExtensions>
         </configuration>
       </plugin>
     </plugins>
