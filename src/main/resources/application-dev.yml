@@ -113,5 +113,9 @@ logging:
 #enable swagger
 swagger:
   enable: true
+#chrome
+chrome:
+  driver:
+    path: /Users/tao.wang15/Desktop/magic_transform/src/main/resources/chromedriver
 
 
