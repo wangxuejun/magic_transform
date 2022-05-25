@@ -1,18 +1,27 @@
 package com.dd.nio.common.operate;
 
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Set;
 
 @Component
@@ -48,7 +57,7 @@ public class ChromeOperator {
         for (Cookie cookie1:cookies) {
             cookie = cookie + cookie1.getName()+"="+cookie1.getValue()+"; ";
         }
-        chromeDriver.close();
+        //chromeDriver.close();
         cookie = cookie+"session_application_code=zcy.agreement";
         return cookie;
     }
@@ -57,53 +66,115 @@ public class ChromeOperator {
         return this.cookie;
     }
 
-    public static void main(String[] args) {
-        System.setProperty("webdriver.chrome.driver","/Users/tao.wang15/Desktop/magic_transform/src/main/resources/chromedriver");
-        ChromeDriver chromeDriver = new ChromeDriver();
+    public void postItem(){
         chromeDriver.get("https://login.anhui.zcygov.cn/user-login/#/");
         chromeDriver.findElement(By.id("username")).sendKeys("WWW13339013301");
         chromeDriver.findElement(By.id("password")).sendKeys("WWW13339013301");
         chromeDriver.findElementByCssSelector(".ant-btn.login-btn.password-login.ant-btn-primary").click();
-        //ant-btn login-btn password-login ant-btn-primary
-        Set<Cookie> cookies = chromeDriver.manage().getCookies();
-        cookies.stream().forEach(x->{
-            System.out.println(x);
-        });
-        chromeDriver.get("https://www.anhui.zcygov.cn/item-center-front/publishgoods/publish?categoryId=7708&protocolId=1028&bidId=80&instanceCode=AHWC");
-        Cookie zcy_log_client_uuid = chromeDriver.manage().getCookieNamed("_zcy_log_client_uuid");
-        Cookie platform_code = chromeDriver.manage().getCookieNamed("platform_code");
-        Cookie session = chromeDriver.manage().getCookieNamed("SESSION");
-        Cookie wsid = chromeDriver.manage().getCookieNamed("wsid");
-        Cookie uid = chromeDriver.manage().getCookieNamed("uid");
-        Cookie user_type = chromeDriver.manage().getCookieNamed("user_type");
-        Cookie tenant_code = chromeDriver.manage().getCookieNamed("tenant_code");
-        Cookie institution_id = chromeDriver.manage().getCookieNamed("institution_id");
-        //chromeDriver.manage().getCookieNamed("institution_id");
-        System.out.println("========================================================");
-        Set<Cookie> cookies1 = chromeDriver.manage().getCookies();
-        cookies1.stream().forEach(x->{
-            System.out.println(x);
-        });
-        /**
-         * session_application_code=zcy.agreement
-         */
-        //session_application_code=zcy.agreement
-        String url = "https://middle.anhui.zcygov.cn/user/apps/getAppsBasicInfo?timestamp=1652949298&path=%2Fdashboard%2Fpanel";
-        String decode = URLDecoder.decode(url);
-        RestTemplate restTemplate = new RestTemplate();
-        //设置请求头参数
-        HttpHeaders requestHeaders = new HttpHeaders();
-        String cookie = "";
-        for (Cookie cookie1:cookies) {
-            cookie = cookie+cookie1.getName()+"="+cookie1.getValue()+"; ";
-        }
-        chromeDriver.close();
-        cookie = cookie+"session_application_code=zcy.agreement";
-        requestHeaders.add("Cookie", cookie);
-        HttpEntity request = new HttpEntity(requestHeaders);
-        ResponseEntity<String> anotherExchange = restTemplate.exchange(decode , HttpMethod.GET,request, String.class);
-        System.out.println(anotherExchange.getBody());
+        ////span[text()='新闻']
+        chromeDriver.findElement(By.xpath("//div[@class='module-box' and @title='商品协议']")).click();
+    }
 
+    public static void main(String[] args) throws InterruptedException {
+        System.setProperty("webdriver.chrome.driver","/Users/tao.wang15/Desktop/magic_transform/src/main/resources/chromedriver");
+        ChromeOptions options = new ChromeOptions();
+//        options.setHeadless(true);
+        ChromeDriver chromeDriver = new ChromeDriver(options);
+        chromeDriver.get("https://login.anhui.zcygov.cn/user-login/#/");
+        Thread.sleep(2000);
+        chromeDriver.findElement(By.id("username")).sendKeys("WWW13339013301");
+        chromeDriver.findElement(By.id("password")).sendKeys("WWW13339013301");
+        chromeDriver.findElementByCssSelector(".ant-btn.login-btn.password-login.ant-btn-primary").click();
+        chromeDriver.findElement(By.xpath("//div[@class='module-box' and @title='商品协议']")).click();
+        Thread.sleep(2000);
+        chromeDriver.findElement(By.xpath("//li[@data-utm-click='324414']")).click();
+        Thread.sleep(3000);
+        chromeDriver.findElement(By.xpath("//span[@class='category-item']/span[text()='家用电器']")).click();
+        Thread.sleep(1000);
+        chromeDriver.findElement(By.xpath("//span[@class='category-item']/span[text()='大家电/配件']")).click();
+        Thread.sleep(1000);
+        chromeDriver.findElement(By.xpath("//span[@class='category-item']/span[text()='洗衣机']")).click();
+        Thread.sleep(2000);
+        //chromeDriver.findElement(By.xpath("//span[@class='category-item']/span[text()='洗衣机']")).click();
+        By xpath = By.xpath("//div[@data-utm-c='c846647']");
+        List<String> gateGoryList = Lists.newArrayList();
+        List<String> typeList = Lists.newArrayList();
+        if (isJudgingElement(chromeDriver, xpath)) {
+            WebElement element1 = chromeDriver.findElement(By.xpath("//div[@class='ant-list spu-list ant-list-vertical ant-list-split']"));
+            List<WebElement> elements1 = element1.findElements(By.xpath("//div[@class='ant-list spu-list ant-list-vertical ant-list-split']/div/div/div/div/div/div/div/span[@class='category-item']"));
+            for (WebElement element:elements1) {
+                gateGoryList.add(element.getText());
+            }
+            //todo 判断查询出来的数据应该点击第几个span
+            elements1.get(0).click();
+            Thread.sleep(2000);
+            By xpathType = By.xpath("//input[@placeholder='请输入型号名称']");
+            if (isJudgingElement(chromeDriver, xpathType)) {
+                // spu-list specification ant-list-vertical ant-list-split
+                WebElement element = chromeDriver.findElement(By.xpath("//div[@class='ant-list spu-list specification ant-list-vertical ant-list-split']"));
+                List<WebElement> elements = element.findElements(By.xpath("//div[@class='ant-list spu-list specification ant-list-vertical ant-list-split']/div/div/div/div/div/span/span[@class='category-item']"));
+                for (WebElement webElement : elements) {
+                    typeList.add(webElement.getText());
+                }
+                //todo 判断查询出来的数据具体型号 click
+                elements.get(0).click();
+            }
+        }
+        chromeDriver.findElement(By.xpath("//button[@class='ant-btn ant-btn-primary']")).click();
+        Thread.sleep(3000);
+        //1.查找商品标题 input todo填充标题
+        chromeDriver.findElement(By.id("name")).clear();
+        chromeDriver.findElement(By.id("name")).sendKeys("nihao");
+        //2.查到通用属性 遍历
+        chromeDriver.findElement(By.xpath("//div[@class='ant-select-selection\n" +
+                "            ant-select-selection--single']")).click();
+        Thread.sleep(3000);
+        List<WebElement> elements34 = chromeDriver.findElements(By.xpath("//div[@class='brand-item']/div/span[@class='brand-item-name']"));
+        for (WebElement webElement:elements34) {
+            System.out.println(webElement.getText());
+        }
+    }
+
+
+    public static String encrypt3ToMD5(String str) {
+        log.debug("MD5待加密字符串：\n"+str);
+        String md5 = "  ";
+        try {
+            md5 = DigestUtils.md5DigestAsHex(str.getBytes("utf-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return md5;
+    }
+
+    public static boolean isJudgingElement(WebDriver webDriver,By by) {
+        try {
+            webDriver.findElement(by);
+            return true;
+        }catch (Exception e){
+            return false;
+        }
+    }
+
+    private static String hashHex(String input, String hashType) {
+        try {
+            MessageDigest md = MessageDigest.getInstance(hashType);
+            md.update(input.getBytes());
+            byte[] byteData = md.digest();
+            StringBuilder buffer = new StringBuilder();
+            byte[] var5 = byteData;
+            int var6 = byteData.length;
+
+            for(int var7 = 0; var7 < var6; ++var7) {
+                byte byteDatum = var5[var7];
+                buffer.append(Integer.toString((byteDatum & 255) + 256, 16).substring(1));
+            }
+
+            return buffer.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }
 
