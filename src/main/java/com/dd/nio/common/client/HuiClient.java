@@ -18,8 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URLDecoder;
 import java.util.List;
 
-@Component
-@Lazy
+
 public class HuiClient {
 
     private static final String MANAGERURL = "https://www.anhui.zcygov.cn/api/biz-item/item-platform/manages/agreement/list";

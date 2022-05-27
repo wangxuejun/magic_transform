@@ -2,12 +2,11 @@ package com.dd.nio.common.operate;
 
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Cookie;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Wait;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -22,7 +21,9 @@ import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 @Component
 @Slf4j
@@ -37,29 +38,20 @@ public class ChromeOperator {
 
     public ChromeOperator(@Value("${chrome.driver.path}") String chromeDriverPath) {
         this.chromeDriverPath = chromeDriverPath;
-        String init = init();
-        cookie = init;
+        init();
     }
 
     public ChromeDriver getChromeDriver(){
         return chromeDriver;
     }
 
-    public String init(){
-        cookie = "";
+    public void init(){
         System.setProperty("webdriver.chrome.driver",chromeDriverPath);
         chromeDriver = new ChromeDriver();
         chromeDriver.get("https://login.anhui.zcygov.cn/user-login/#/");
         chromeDriver.findElement(By.id("username")).sendKeys("WWW13339013301");
         chromeDriver.findElement(By.id("password")).sendKeys("WWW13339013301");
         chromeDriver.findElementByCssSelector(".ant-btn.login-btn.password-login.ant-btn-primary").click();
-        Set<Cookie> cookies = chromeDriver.manage().getCookies();
-        for (Cookie cookie1:cookies) {
-            cookie = cookie + cookie1.getName()+"="+cookie1.getValue()+"; ";
-        }
-        //chromeDriver.close();
-        cookie = cookie+"session_application_code=zcy.agreement";
-        return cookie;
     }
 
     public String getCookie(){
@@ -85,96 +77,189 @@ public class ChromeOperator {
         chromeDriver.findElement(By.id("username")).sendKeys("WWW13339013301");
         chromeDriver.findElement(By.id("password")).sendKeys("WWW13339013301");
         chromeDriver.findElementByCssSelector(".ant-btn.login-btn.password-login.ant-btn-primary").click();
-        chromeDriver.findElement(By.xpath("//div[@class='module-box' and @title='商品协议']")).click();
-        Thread.sleep(2000);
-        chromeDriver.findElement(By.xpath("//li[@data-utm-click='324414']")).click();
-        Thread.sleep(3000);
-        chromeDriver.findElement(By.xpath("//span[@class='category-item']/span[text()='家用电器']")).click();
-        Thread.sleep(1000);
-        chromeDriver.findElement(By.xpath("//span[@class='category-item']/span[text()='大家电/配件']")).click();
-        Thread.sleep(1000);
-        chromeDriver.findElement(By.xpath("//span[@class='category-item']/span[text()='洗衣机']")).click();
-        Thread.sleep(2000);
-        //chromeDriver.findElement(By.xpath("//span[@class='category-item']/span[text()='洗衣机']")).click();
-        By xpath = By.xpath("//div[@data-utm-c='c846647']");
-        List<String> gateGoryList = Lists.newArrayList();
-        List<String> typeList = Lists.newArrayList();
-        if (isJudgingElement(chromeDriver, xpath)) {
-            WebElement element1 = chromeDriver.findElement(By.xpath("//div[@class='ant-list spu-list ant-list-vertical ant-list-split']"));
-            List<WebElement> elements1 = element1.findElements(By.xpath("//div[@class='ant-list spu-list ant-list-vertical ant-list-split']/div/div/div/div/div/div/div/span[@class='category-item']"));
-            for (WebElement element:elements1) {
-                gateGoryList.add(element.getText());
-            }
-            //todo 判断查询出来的数据应该点击第几个span
-            elements1.get(0).click();
-            Thread.sleep(2000);
-            By xpathType = By.xpath("//input[@placeholder='请输入型号名称']");
-            if (isJudgingElement(chromeDriver, xpathType)) {
-                // spu-list specification ant-list-vertical ant-list-split
-                WebElement element = chromeDriver.findElement(By.xpath("//div[@class='ant-list spu-list specification ant-list-vertical ant-list-split']"));
-                List<WebElement> elements = element.findElements(By.xpath("//div[@class='ant-list spu-list specification ant-list-vertical ant-list-split']/div/div/div/div/div/span/span[@class='category-item']"));
-                for (WebElement webElement : elements) {
-                    typeList.add(webElement.getText());
-                }
-                //todo 判断查询出来的数据具体型号 click
-                elements.get(0).click();
-            }
-        }
-        chromeDriver.findElement(By.xpath("//button[@class='ant-btn ant-btn-primary']")).click();
-        Thread.sleep(3000);
+//        chromeDriver.findElement(By.xpath("//div[@class='module-box' and @title='商品协议']")).click();
+//        Thread.sleep(2000);
+//        chromeDriver.findElement(By.xpath("//li[@data-utm-click='324414']")).click();
+//        Thread.sleep(3000);
+//        chromeDriver.findElement(By.xpath("//span[@class='category-item']/span[text()='家用电器']")).click();
+//        Thread.sleep(1000);
+//        chromeDriver.findElement(By.xpath("//span[@class='category-item']/span[text()='大家电/配件']")).click();
+//        Thread.sleep(1000);
+//        chromeDriver.findElement(By.xpath("//span[@class='category-item']/span[text()='洗衣机']")).click();
+//        Thread.sleep(2000);
+//        //chromeDriver.findElement(By.xpath("//span[@class='category-item']/span[text()='洗衣机']")).click();
+//        By xpath = By.xpath("//div[@data-utm-c='c846647']");
+//        List<String> gateGoryList = Lists.newArrayList();
+//        List<String> typeList = Lists.newArrayList();
+//        if (isJudgingElement(chromeDriver, xpath)) {
+//            WebElement element1 = chromeDriver.findElement(By.xpath("//div[@class='ant-list spu-list ant-list-vertical ant-list-split']"));
+//            List<WebElement> elements1 = element1.findElements(By.xpath("//div[@class='ant-list spu-list ant-list-vertical ant-list-split']/div/div/div/div/div/div/div/span[@class='category-item']"));
+//            for (WebElement element:elements1) {
+//                gateGoryList.add(element.getText());
+//            }
+//            //todo 判断查询出来的数据应该点击第几个span
+//            elements1.get(0).click();
+//            Thread.sleep(2000);
+//            By xpathType = By.xpath("//input[@placeholder='请输入型号名称']");
+//            if (isJudgingElement(chromeDriver, xpathType)) {
+//                // spu-list specification ant-list-vertical ant-list-split
+//                WebElement element = chromeDriver.findElement(By.xpath("//div[@class='ant-list spu-list specification ant-list-vertical ant-list-split']"));
+//                List<WebElement> elements = element.findElements(By.xpath("//div[@class='ant-list spu-list specification ant-list-vertical ant-list-split']/div/div/div/div/div/span/span[@class='category-item']"));
+//                for (WebElement webElement : elements) {
+//                    typeList.add(webElement.getText());
+//                }
+//                //todo 判断查询出来的数据具体型号 click
+//                elements.get(0).click();
+//            }
+//        }
+//        chromeDriver.findElement(By.xpath("//button[@class='ant-btn ant-btn-primary']")).click();
+//        Thread.sleep(3000);
         //1.查找商品标题 input todo填充标题
-        chromeDriver.findElement(By.id("name")).clear();
-        chromeDriver.findElement(By.id("name")).sendKeys("nihao");
-        //2.查到通用属性 遍历
-        chromeDriver.findElement(By.xpath("//div[@class='ant-select-selection\n" +
-                "            ant-select-selection--single']")).click();
+        chromeDriver.get("https://www.anhui.zcygov.cn/item-center-front/publishgoods/publish?categoryId=7903&spuId=100785469&protocolId=1028&bidId=80&instanceCode=AHWC");
         Thread.sleep(3000);
-        List<WebElement> elements34 = chromeDriver.findElements(By.xpath("//div[@class='brand-item']/div/span[@class='brand-item-name']"));
-        for (WebElement webElement:elements34) {
-            System.out.println(webElement.getText());
-        }
+        WebElement elementByCssSelector = chromeDriver.findElementByCssSelector("label[title='标准规格']");
+        System.out.println(elementByCssSelector.getText());
+        WebElement element = elementByCssSelector.findElement(By.xpath("../following-sibling::div"));
+        //form
+//        WebElement element1 = element.findElement(By.xpath(".//form"));
+//        WebElement element2 = element1.findElement(By.xpath(".//input[@class='ant-radio-input']"));
+//        System.out.println(element2.getAttribute("class"));
+//        element2.click();
+//        WebElement element3 = element1.findElement(By.xpath(".//span[@class='zcy-tenant-addressCode-undefined ant-cascader-picker zcy-tenant-addressCode-undefined']"));
+//        element3.click();
+        WebElement element1 = element.findElement(By.xpath(".//input[@type='checkbox']"));
+        System.out.println(element1.getAttribute("value"));
+        WebElement element2 = element.findElement(By.xpath(".//a[text()='点击添加']"));
+        element2.click();
+        //Thread.sleep(5000);
+//        wat(chromeDriver,By.xpath("//ul[@class='ant-select-dropdown-menu  ant-select-dropdown-menu-root ant-select-dropdown-menu-vertical']"));
+//        WebElement elementDiv = chromeDriver.findElement(By.xpath("//ul[@class='ant-select-dropdown-menu  ant-select-dropdown-menu-root ant-select-dropdown-menu-vertical']"));
+//        List<WebElement> element2 = elementDiv.findElements(By.xpath(".//li[@class='ant-select-dropdown-menu-item']"));
+//        WebElement judgingElement = isJudgingElement(elementDiv, By.xpath(".//li[@class='ant-select-dropdown-menu-item ant-select-dropdown-menu-item-selected']"));
+//        WebElement judgingElementActive = isJudgingElement(elementDiv,By.xpath(".//li[@class='ant-select-dropdown-menu-item ant-select-dropdown-menu-item-active']"));
+//        WebElement judgingElementActiveSelect = isJudgingElement(elementDiv,By.xpath(".//li[@class='ant-select-dropdown-menu-item ant-select-dropdown-menu-item-active ant-select-dropdown-menu-item-selected']"));
+//        if (Objects.nonNull(judgingElement)) {
+//            element2.add(judgingElement);
+//        }
+//        if (Objects.nonNull(judgingElementActive)){
+//            element2.add(judgingElementActive);
+//        }
+//        if (Objects.nonNull(judgingElementActiveSelect)){
+//            element2.add(judgingElementActiveSelect);
+//        }
+//        for (WebElement webElement:element2) {
+//            System.out.println(webElement.getAttribute("innerText"));
+//            if (webElement.getAttribute("innerText").equals("香山")){
+//                webElement.click();
+//            }
+//        }
+
+//        List<WebElement> elements = elementDiv.findElements(By.xpath("//span[@class='brand-item-name']"));
+//        for (WebElement webElement:elements) {
+//            System.out.println(webElement.getText());
+//            System.out.println(webElement.getAttribute("innerText"));
+//        }
+        String aClass = element.getAttribute("class");
+        System.out.println(aClass);
+//        chromeDriver.findElement(By.id("name")).clear();
+//        chromeDriver.findElement(By.id("name")).sendKeys("nihao");
+//        chromeDriver.findElement(By.xpath("/html/body/div[2]/div/div/div/div/div[1]/div/div[7]/div[2]/div[1]/div/div/div/div/div[2]/div/span/div/div[2]/div[1]/div[2]/div")).click();
+//        WebElement element3 = chromeDriver.findElement(By.xpath("/html/body/div[4]/div/div[2]/div/div[1]/div[2]/div[2]/span/div/span/input"));
+//        element3.sendKeys("/Users/tao.wang15/Desktop/magic_transform/src/main/resources/aa.png");
+//        //2. 找到不不同属性
+//        WebElement basicEle = chromeDriver.findElement(By.id("基本信息"));
+//        List<WebElement> elements = basicEle.findElements(By.xpath("div/div[@class='zcy-panel-sub zcy-panel-sub-has-child']"));
+//        for (WebElement webElement :elements) {
+//            List<WebElement> eleTypes = webElement.findElements(By.xpath("div[@class='zcy-panel-sub-title zcy-panel-sub-bordered zcy-panel-sub-bordered-has-child']/span"));
+//            for (WebElement element:eleTypes) {
+//                System.out.println(element.getText());
+//                if ("通用属性".equals(element.getText())){
+//                    //todo 判断是什么属性
+//                    List<WebElement> elements1 = webElement.findElements(By.xpath("div/div/div[@class='ant-col-12 zcy-form-grid-col-bordered']"));
+//                    for (WebElement element1:elements1) {
+//                        WebElement element2 = isJudgingElement(element1,By.xpath("div/div/label[@class='ant-form-item-required']"));
+//                        if (Objects.nonNull(element2)) {
+//                            String type = getType(element1);
+//                            if (type.equals("input")){
+//                                fillingInput(element1);
+//                            }else if (type.equals("form")){
+//                                fillingForm(element1);
+//                            }else {
+//                                fillingSelect(element1,"海尔");
+//                            }
+//                        }
+//                        //对比数据库的数据判断是什么类型
+//
+//                    }
+//                }
+//            }
+//        }
+        //2.查到通用属性 遍历
     }
 
-
-    public static String encrypt3ToMD5(String str) {
-        log.debug("MD5待加密字符串：\n"+str);
-        String md5 = "  ";
-        try {
-            md5 = DigestUtils.md5DigestAsHex(str.getBytes("utf-8"));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return md5;
-    }
-
-    public static boolean isJudgingElement(WebDriver webDriver,By by) {
-        try {
-            webDriver.findElement(by);
-            return true;
-        }catch (Exception e){
-            return false;
-        }
-    }
-
-    private static String hashHex(String input, String hashType) {
-        try {
-            MessageDigest md = MessageDigest.getInstance(hashType);
-            md.update(input.getBytes());
-            byte[] byteData = md.digest();
-            StringBuilder buffer = new StringBuilder();
-            byte[] var5 = byteData;
-            int var6 = byteData.length;
-
-            for(int var7 = 0; var7 < var6; ++var7) {
-                byte byteDatum = var5[var7];
-                buffer.append(Integer.toString((byteDatum & 255) + 256, 16).substring(1));
+    public static void wat(ChromeDriver driver,By by) {
+        Wait<WebDriver> wait = new FluentWait<WebDriver>(driver)
+                .withTimeout(30, TimeUnit.SECONDS)
+                .pollingEvery(8, TimeUnit.SECONDS)
+                .ignoring(NoSuchElementException.class);
+        WebElement clickseleniumlink = wait.until(new Function<WebDriver, WebElement>() {
+            @Override
+            public WebElement apply(WebDriver driver) {
+                return driver.findElement(by);
             }
+        });
+    }
 
-            return buffer.toString();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+    public static String getType(WebElement element1){
+        //查找是否有input框 并且找不到form表单 这种是纯input
+        WebElement input = isJudgingElement(element1, By.xpath("div/div[@class='ant-form-item-control-wrapper ant-col-xs-18 ant-col-sm-18']/div/span/div/div/div/div/ul/li/div/input"));
+        if (Objects.nonNull(input)){
+            return "input";
         }
-        return "";
+        //如果有没有form表单 这种是form
+        WebElement judgingElement = isJudgingElement(element1, By.xpath("div/div/div/span/div/form[@class='ant-form ant-form-horizontal']"));
+        if (Objects.nonNull(judgingElement)){
+            return "form";
+        }
+        return "select";
+    }
+
+    public static void fillingSelect(WebElement element,String brand) throws InterruptedException {
+        element.findElement(By.xpath("div/div/div/span[@class='ant-form-item-children']")).click();
+        Thread.sleep(3000);
+        //List<WebElement> elements34 = element.findElements(By.xpath("//div[@class='brand-item']/div/span[@class='brand-item-name']"));
+        List<WebElement> elements34 = element.findElements(By.xpath("//ul[@class='ant-select-dropdown-menu  ant-select-dropdown-menu-root ant-select-dropdown-menu-vertical']/li"));
+        for (WebElement webElement:elements34) {
+            WebElement element1 = webElement.findElement(By.xpath("div/div/span"));
+            if (element1.getText().contains(brand)){
+                webElement.click();
+                break;
+            }
+        }
+    }
+
+    public static void fillingInput(WebElement element){
+        element.findElement(By.xpath("div/div[@class='ant-form-item-control-wrapper ant-col-xs-18 ant-col-sm-18']/div/span/div/div/div/div/ul/li/div/input"))
+                .sendKeys("58S");
+    }
+
+    public static void fillingForm(WebElement element){
+        WebElement form = element.findElement(By.xpath("div/div/div/span/div/form[@class='ant-form ant-form-horizontal']"));
+        WebElement span = form.findElement(By.xpath("div/div/div/span/div/label/span[text()='境内']"));
+        span.findElement(By.xpath("preceding-sibling::input")).click();
+        form.findElement(By.xpath("span/span/input")).click();
+        WebElement element1 = element.findElement(By.xpath("//div[@class='ant-cascader-menus ant-cascader-menus-placement-bottomLeftant-cascader-menus ant-cascader-menus-placement-bottomLeft']"));
+        List<WebElement> elements = element1.findElements(By.xpath("div/ul/li"));
+        //todo
+    }
+
+    public static WebElement  isJudgingElement(WebElement webDriver,By by) {
+        try {
+            WebElement element = webDriver.findElement(by);
+            return element;
+        }catch (Exception e){
+            return null;
+        }
     }
 }
 
