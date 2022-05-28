@@ -16,39 +16,16 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class GoodAttribute implements Serializable {
+public class CatInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    private Integer id;
 
-    private Long goodId;
+    private Integer catId;
 
-    /**
-     * 属性值
-     */
-    private String attributeValue;
-
-    /**
-     * 属性key
-     */
-    private String attributeKey;
-
-    /**
-     * 分组
-     */
-    private String groupKey;
-
-    /**
-     * 分组id
-     */
-    private Long propertyId;
-
-    /**
-     * 其他字段
-     */
-    private String other;
+    private String catStr;
 
 
 }

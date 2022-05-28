@@ -18,4 +18,6 @@ public interface IGoodService extends IService<Good> {
 
     List<GoodVo> getPageGoods();
 
+    void deleteGood(Good good);
+
 }

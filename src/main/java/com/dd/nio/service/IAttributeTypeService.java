@@ -1,7 +1,8 @@
 package com.dd.nio.service;
 
-import com.dd.nio.entity.GoodAttribute;
+import com.dd.nio.entity.AttributeType;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.dd.nio.entity.vo.AttributeTypeVo;
 import org.springframework.stereotype.Service;
 
 /**
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
  * @since 2022-05-27
  */
 @Service
-public interface IGoodAttributeService extends IService<GoodAttribute> {
+public interface IAttributeTypeService extends IService<AttributeType> {
 
+    AttributeTypeVo getAttributeVo(Long attributeId);
 }

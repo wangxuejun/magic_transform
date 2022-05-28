@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * </p>
  *
  * @author tao.wang15
- * @since 2022-05-26
+ * @since 2022-05-27
  */
 @Service
 public class GoodPriceServiceImpl extends ServiceImpl<GoodPriceMapper, GoodPrice> implements IGoodPriceService {

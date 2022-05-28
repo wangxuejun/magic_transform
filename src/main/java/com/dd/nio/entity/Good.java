@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author tao.wang15
- * @since 2022-05-26
+ * @since 2022-05-28
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -29,19 +29,11 @@ public class Good implements Serializable {
     private String name;
 
     /**
-     * 商品详情
-     */
-    private String richText;
-
-    /**
-     * 商品库存
-     */
-    private Long stock;
-
-    /**
      * 类型id
      */
     private String categoryString;
+
+    private Integer isEffect;
 
 
 }

@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author tao.wang15
- * @since 2022-05-26
+ * @since 2022-05-28
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -23,19 +23,17 @@ public class GoodPrice implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    private Integer goodId;
+    private Double marketPrice;
 
-    private Integer marketPrice;
+    private Double channelPrice;
 
-    private Integer channelPrice;
+    private Double agreementPrice;
 
-    private Integer agreementPrice;
+    private Double discount;
 
-    private Integer discount;
+    private Double platformPrice;
 
-    private Integer platformPrice;
-
-    private String skulInfo;
+    private Integer stock;
 
 
 }

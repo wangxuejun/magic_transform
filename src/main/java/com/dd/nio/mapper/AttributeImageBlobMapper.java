@@ -1,6 +1,6 @@
 package com.dd.nio.mapper;
 
-import com.dd.nio.entity.Good;
+import com.dd.nio.entity.AttributeImageBlob;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -10,9 +10,9 @@ import org.apache.ibatis.annotations.Mapper;
  * </p>
  *
  * @author tao.wang15
- * @since 2022-05-26
+ * @since 2022-05-27
  */
 @Mapper
-public interface GoodMapper extends BaseMapper<Good> {
+public interface AttributeImageBlobMapper extends BaseMapper<AttributeImageBlob> {
 
 }

@@ -77,6 +77,23 @@ public class ChromeOperator {
         chromeDriver.findElement(By.id("username")).sendKeys("WWW13339013301");
         chromeDriver.findElement(By.id("password")).sendKeys("WWW13339013301");
         chromeDriver.findElementByCssSelector(".ant-btn.login-btn.password-login.ant-btn-primary").click();
+        String category = "3C数码,电脑/服务器/工作站,台式整机";
+        chromeDriver.get("https://www.anhui.zcygov.cn/item-center-front/releaseGoods?_app_=zcy.agreement");
+        wat(chromeDriver,By.xpath("//div[@class='list-header']"));
+        WebElement elementListOne = chromeDriver.findElement(By.xpath("//div[@class='list-header']"));
+        List<String> listTextOne = Lists.newArrayList();
+        if (elementListOne.getAttribute("innerText").equals("一级类目")){
+            WebElement element = elementListOne.findElement(By.xpath("../../following-sibling::div"));
+            WebElement elementText = element.findElement(By.xpath(".//div[@class='ant-list-item active']"));
+            WebElement elementTextActive = elementText.findElement(By.xpath(".//span[@class='category-item active']"));
+            listTextOne.add(elementTextActive.getAttribute("innerText"));
+            List<WebElement> elementTexts = element.findElements(By.xpath(".//div[@class='ant-list-item no-active']"));
+            //elementTexts.add(elementText);
+            for (WebElement webElement:elementTexts) {
+                WebElement elementTextNoActive = webElement.findElement(By.xpath(".//span[@class='category-item']"));
+                listTextOne.add(elementTextNoActive.getAttribute("innerText"));
+            }
+        }
 //        chromeDriver.findElement(By.xpath("//div[@class='module-box' and @title='商品协议']")).click();
 //        Thread.sleep(2000);
 //        chromeDriver.findElement(By.xpath("//li[@data-utm-click='324414']")).click();

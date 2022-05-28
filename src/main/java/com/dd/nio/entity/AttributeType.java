@@ -16,39 +16,23 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class GoodAttribute implements Serializable {
+public class AttributeType implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    private Long goodId;
+    private String type;
+
+    private Long imageId;
+
+    private Long priceId;
 
     /**
-     * 属性值
+     * 电商链接
      */
-    private String attributeValue;
-
-    /**
-     * 属性key
-     */
-    private String attributeKey;
-
-    /**
-     * 分组
-     */
-    private String groupKey;
-
-    /**
-     * 分组id
-     */
-    private Long propertyId;
-
-    /**
-     * 其他字段
-     */
-    private String other;
+    private String attributeHref;
 
 
 }

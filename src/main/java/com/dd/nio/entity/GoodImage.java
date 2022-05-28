@@ -13,7 +13,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author tao.wang15
- * @since 2022-05-26
+ * @since 2022-05-28
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -23,8 +23,6 @@ public class GoodImage implements Serializable {
 
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
-
-    private Long goodId;
 
     /**
      * 商品图片url

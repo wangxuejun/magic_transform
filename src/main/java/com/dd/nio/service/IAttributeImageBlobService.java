@@ -1,6 +1,6 @@
 package com.dd.nio.service;
 
-import com.dd.nio.entity.GoodAttribute;
+import com.dd.nio.entity.AttributeImageBlob;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +13,6 @@ import org.springframework.stereotype.Service;
  * @since 2022-05-27
  */
 @Service
-public interface IGoodAttributeService extends IService<GoodAttribute> {
+public interface IAttributeImageBlobService extends IService<AttributeImageBlob> {
 
 }

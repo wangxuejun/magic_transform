@@ -13,7 +13,6 @@ import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -37,7 +36,8 @@ public class GoodServiceImpl extends ServiceImpl<GoodMapper, Good> implements IG
     @Override
     public List<GoodVo> getPageGoods() {
         List<GoodVo> res = Lists.newArrayList();
-        Page<Good> goodPage = goodMapper.selectPage(new Page<>(1, 10), new LambdaQueryWrapper<Good>());
+        Page<Good> goodPage = goodMapper.selectPage(new Page<>(1, 10), new LambdaQueryWrapper<Good>()
+                .eq(Good::getIsEffect,1));
         List<Good> records = goodPage.getRecords();
         records.stream().forEach(record -> {
             List<GoodAttribute> list = goodAttributeService.list(new LambdaQueryWrapper<GoodAttribute>().eq(GoodAttribute::getGoodId, record.getId()));
@@ -47,6 +47,12 @@ public class GoodServiceImpl extends ServiceImpl<GoodMapper, Good> implements IG
             res.add(goodVo);
         });
         return res;
+    }
+
+    @Override
+    public void deleteGood(Good good) {
+        good.setIsEffect(0);
+        goodMapper.updateById(good);
     }
 
 }
