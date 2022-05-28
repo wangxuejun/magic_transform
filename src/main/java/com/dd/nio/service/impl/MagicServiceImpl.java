@@ -8,8 +8,6 @@ import com.dd.nio.entity.GoodPrice;
 import com.dd.nio.entity.vo.AttributeTypeVo;
 import com.dd.nio.entity.vo.GoodVo;
 import com.dd.nio.service.*;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
@@ -51,19 +49,24 @@ public class MagicServiceImpl implements MagicService {
     private IGoodImageService iGoodImageService;
 
 
+    @Override
     public void fillingGoods() throws InterruptedException {
         ChromeDriver chromeDriver = chromeOperator.getChromeDriver();
         List<GoodVo> pageGoods = goodService.getPageGoods();
         chromeDriver.get("https://www.anhui.zcygov.cn/item-center-front/releaseGoods?_app_=zcy.agreement");
         wat(chromeDriver,By.xpath("//div[@class='list-header'][1]"));
+        Thread.sleep(1000);
         for (GoodVo goodVo:pageGoods) {
             int count = 1;
             List<String> list = Arrays.asList(goodVo.getGood().getCategoryString().split(","));
-            if (ChooseCategory(chromeDriver,count,list.get(0),"一级目录")){
+            if (ChooseCategory(chromeDriver,count,list.get(0),"一级类目")){
                 count ++;
-                if (ChooseCategory(chromeDriver,count,list.get(1),"二级目录")){
+                Thread.sleep(1000);
+                if (ChooseCategory(chromeDriver,count,list.get(1),"二级类目")){
                     count ++;
-                    if (ChooseCategory(chromeDriver,count,list.get(2),"三级目录")){
+                    Thread.sleep(1000);
+                    if (ChooseCategory(chromeDriver,count,list.get(2),"三级类目")){
+                        Thread.sleep(1000);
                         WebElement judgingElement = isJudgingElement(chromeDriver, By.xpath("//div[@class='spu']"));
                         if (Objects.nonNull(judgingElement)){
                             //获取品牌型号
@@ -111,9 +114,7 @@ public class MagicServiceImpl implements MagicService {
 
     public void Choose(WebElement element,String brand,String type){
         WebElement element1 = element.findElement(By.xpath(".//div[@class='ant-list spu-list ant-list-vertical ant-list-split']"));
-        WebElement elementActive = element1.findElement(By.xpath(".//div[@class='ant-list-item active']"));
         List<WebElement> elements = element1.findElements(By.xpath(".//div[@class='ant-list-item no-active']"));
-        elements.add(elementActive);
         for (WebElement webElement:elements){
             WebElement span = webElement.findElement(By.xpath(".//div/div/div/span"));
             if (span.getAttribute("innerText").equals(brand)){
@@ -131,37 +132,32 @@ public class MagicServiceImpl implements MagicService {
     }
 
     public Boolean ChooseCategory(ChromeDriver chromeDriver,Integer count,String categoryStr,String level){
-        wat(chromeDriver,By.xpath("//div[@class='list-header']["+count+"]"));
-        List<WebElement> elements = chromeDriver.findElements(By.xpath("div[@class='ant-list category-list ant-list-vertical ant-list-split']"));
+        String path = "//div[@class='list-header']["+count+"]";
+        wat(chromeDriver,By.xpath(path));
+        List<WebElement> elements = chromeDriver.findElements(By.xpath("//div[@class='ant-list category-list ant-list-vertical ant-list-split']"));
         WebElement elementListOne = chromeDriver.findElement(By.xpath("//div[@class='list-header']["+count+"]"));
         if (elementListOne.getAttribute("innerText").equals(level)){
             WebElement element = elementListOne.findElement(By.xpath("../../following-sibling::div"));
-            WebElement elementText = element.findElement(By.xpath(".//div[@class='ant-list-item active']"));
+            System.out.println(element.getAttribute("class"));
             List<WebElement> elementTexts = element.findElements(By.xpath(".//div[@class='ant-list-item no-active']"));
-            elementTexts.add(elementText);
             Boolean isClick = false;
             for (WebElement webElement:elementTexts) {
-                WebElement judgingElement = isJudgingElement(webElement, By.xpath(".//span[@class='category-item active']"));
+                WebElement judgingElement = isJudgingElement(webElement, By.xpath(".//span[@class='category-item']"));
                 if (Objects.nonNull(judgingElement)){
                     if (judgingElement.getAttribute("innerText").equals(categoryStr)){
                         webElement.click();
                         isClick = true;
-                    }
-                }
-                WebElement judgingElement1 = isJudgingElement(webElement, By.xpath(".//span[@class='category-item np-active']"));
-                if (Objects.nonNull(judgingElement1)){
-                    if (judgingElement1.getAttribute("innerText").equals(categoryStr)){
-                        webElement.click();
-                        isClick = true;
+                        break;
                     }
                 }
             }
-            if (!isClick){
-                List<WebElement> elementsLast = chromeDriver.findElements(By.xpath("div[@class='ant-list category-list ant-list-vertical ant-list-split']"));
+            if (isClick){
+                List<WebElement> elementsLast = chromeDriver.findElements(By.xpath("//div[@class='ant-list category-list ant-list-vertical ant-list-split']"));
                 if (count<3) {
                     if (elements.size() == elementsLast.size()) {
                         return false;
                     } else {
+                        System.out.println(level+"yyy");
                         return true;
                     }
                 }else {
