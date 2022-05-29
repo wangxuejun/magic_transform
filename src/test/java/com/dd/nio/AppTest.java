@@ -7,6 +7,7 @@ import com.dd.nio.common.client.response.Category;
 import com.dd.nio.common.client.response.ManagerData;
 import com.dd.nio.common.client.response.ManagerResponse;
 import com.dd.nio.common.client.response.WareHouse;
+import com.dd.nio.service.MagicService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,15 +26,15 @@ public class AppTest
 {
 
     @Autowired
-    private HuiClient huiClient;
+    private MagicService magicService;
+
 
     @Test
-    public void shouldAnswerWithTrue() {
+    public void shouldAnswerWithTrue() throws InterruptedException {
 //        ManagerData managerData = huiClient.getManageIds();
 //        System.out.println(managerData);
 //        List<Category> categoryId = huiClient.getCategoryId(managerData.getId(), managerData.getBids().get(0).getId(), 0L);
 //        System.out.println(categoryId);
-        String wareHouse = huiClient.getWareHouse();
-        System.out.println(wareHouse);
+        magicService.fillingGoods();
     }
 }

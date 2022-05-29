@@ -116,6 +116,6 @@ swagger:
 #chrome
 chrome:
   driver:
-    path: /Users/tao.wang15/Desktop/magic_transform/src/main/resources/chromedriver
+    path: src/main/resources/chromedriver
 
 
