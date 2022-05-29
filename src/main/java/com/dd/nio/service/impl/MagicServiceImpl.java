@@ -15,8 +15,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.FluentWait;
-import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -550,15 +549,17 @@ public class MagicServiceImpl implements MagicService {
     }
 
     public void wat(ChromeDriver driver,By by) {
-        Wait<WebDriver> wait = new FluentWait<WebDriver>(driver)
-                .withTimeout(30, TimeUnit.SECONDS)
-                .pollingEvery(8, TimeUnit.SECONDS)
-                .ignoring(NoSuchElementException.class);
-        WebElement clickseleniumlink = wait.until(new Function<WebDriver, WebElement>() {
-            @Override
-            public WebElement apply(WebDriver driver) {
-                return driver.findElement(by);
-            }
-        });
+//        Wait<WebDriver> wait = new FluentWait<WebDriver>(driver)
+//                .withTimeout(30, TimeUnit.SECONDS)
+//                .pollingEvery(8, TimeUnit.SECONDS)
+//                .ignoring(NoSuchElementException.class);
+//        WebElement clickseleniumlink = wait.until(new Function<WebDriver, WebElement>() {
+//            @Override
+//            public WebElement apply(WebDriver driver) {
+//                return driver.findElement(by);
+//            }
+//        });
+        new WebDriverWait(driver,10).until(
+                ExpectedConditions.presenceOfElementLocated(By.cssSelector("css locator")));
     }
 }
