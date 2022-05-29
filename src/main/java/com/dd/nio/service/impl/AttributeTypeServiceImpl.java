@@ -12,6 +12,8 @@ import com.dd.nio.service.IGoodPriceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 /**
  * <p>
  *  服务实现类
@@ -41,7 +43,7 @@ public class AttributeTypeServiceImpl extends ServiceImpl<AttributeTypeMapper, A
         GoodPrice price = iGoodPriceService.getById(attributeType.getPriceId());
         attributeTypeVo.setAttributeType(attributeType);
         attributeTypeVo.setGoodPrice(price);
-        if (!attributeType.getImageId().equals(0L)){
+        if (Objects.nonNull(attributeType.getImageId()) && !attributeType.getImageId().equals(0L)){
             AttributeImageBlob byId = attributeImageBlobService.getById(attributeType.getImageId());
             attributeTypeVo.setAttributeImageBlob(byId);
         }
