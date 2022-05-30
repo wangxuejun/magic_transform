@@ -114,6 +114,7 @@ public class MagicServiceImpl implements MagicService {
         }
         Set<String> imageSet = new HashSet<>();
         Integer ciShu = 0;
+        wat(chromeDriver, By.id("name"));
         WebElement name = chromeDriver.findElement(By.id("name"));
         name.sendKeys(good.getName());
         for (GoodAttribute attribute:pinAtts) {
@@ -306,7 +307,6 @@ public class MagicServiceImpl implements MagicService {
         WebElement element1 = element.findElement(By.xpath(".//form"));
         WebElement element2 = element1.findElement(By.xpath(".//input[@class='ant-radio-input']"));
         chromeDriver.executeScript("arguments[0].scrollIntoView(false);", element2);
-        System.out.println(element2.getAttribute("class"));
         element2.click();
         WebElement element3 = element1.findElement(By.xpath(".//span[@class='zcy-tenant-addressCode-undefined ant-cascader-picker zcy-tenant-addressCode-undefined']"));
         element3.click();
@@ -334,7 +334,7 @@ public class MagicServiceImpl implements MagicService {
         wat(chromeDriver,element4,By.xpath(".//li"));
         List<WebElement> elements2 = element6.findElements(By.xpath(".//li"));
         for (WebElement webElement:elements2){
-            if (webElement.getAttribute("innerText").equals(list.get(1))){
+            if (webElement.getAttribute("innerText").equals(list.get(2))){
                 webElement.click();
             }
         }
@@ -506,7 +506,7 @@ public class MagicServiceImpl implements MagicService {
             httpUrl = (HttpURLConnection) url.openConnection();
             httpUrl.connect();
             bis = new BufferedInputStream(httpUrl.getInputStream());
-            path = "/Users/tao.wang15/Desktop/magic_transform/src/main/resources/"+s+".png";
+            path = "/Users/ye.li3/PycharmProjects/magic_transform/src/main/resources/"+s+".png";
             byte[] streamBytes = getStreamBytes(bis);
             byte[] bytes = PicUtils.compressPicForScale(streamBytes, 100);
             fileToBytes(bytes,path);
