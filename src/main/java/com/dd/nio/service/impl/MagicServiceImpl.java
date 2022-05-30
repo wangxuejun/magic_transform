@@ -72,65 +72,6 @@ public class MagicServiceImpl implements MagicService {
         }
     }
 
-//    public void Choose(WebElement element,String brand,String type) throws InterruptedException {
-//        WebElement element1 = element.findElement(By.xpath(".//div[@class='ant-list spu-list ant-list-vertical ant-list-split']"));
-//        List<WebElement> elements = element1.findElements(By.xpath(".//div[@class='ant-list-item no-active']"));
-//        for (WebElement webElement:elements){
-//            WebElement span = webElement.findElement(By.xpath(".//div/div/div/span"));
-//            if (span.getAttribute("innerText").equals(brand)){
-//                webElement.click();
-//            }
-//        }
-//        Thread.sleep(2000);
-//        WebElement element1Type = element.findElement(By.xpath(".//div[@class='ant-list spu-list specification ant-list-vertical ant-list-split']"));
-//        List<WebElement> elementsType = element1Type.findElements(By.xpath(".//div[@class='ant-list-item no-active']"));
-//        for (WebElement webElement:elementsType){
-//            WebElement span = webElement.findElement(By.xpath(".//div/span/span[@class='category-item']"));
-//            if (span.getAttribute("innerText").equals(type)){
-//                webElement.click();
-//            }
-//        }
-//    }
-//
-//    public Boolean ChooseCategory(ChromeDriver chromeDriver,Integer count,String categoryStr,String level){
-//        String path = "//div[@class='list-header']["+count+"]";
-//        //wat(chromeDriver,By.xpath(path));
-//        List<WebElement> elements = chromeDriver.findElements(By.xpath("//div[@class='ant-list category-list ant-list-vertical ant-list-split']"));
-//        WebElement elementListOne = chromeDriver.findElements(By.xpath("//div[@class='list-header']")).get(count-1);
-//        if (elementListOne.getAttribute("innerText").equals(level)){
-//            WebElement element = elementListOne.findElement(By.xpath("../../following-sibling::div"));
-//            System.out.println(element.getAttribute("class"));
-//            List<WebElement> elementTexts = element.findElements(By.xpath(".//div[@class='ant-list-item no-active']"));
-//            Boolean isClick = false;
-//            for (WebElement webElement:elementTexts) {
-//                WebElement judgingElement = isJudgingElement(webElement, By.xpath(".//span[@class='category-item']"));
-//                if (Objects.nonNull(judgingElement)){
-//                    if (judgingElement.getAttribute("innerText").equals(categoryStr)){
-//                        webElement.click();
-//                        isClick = true;
-//                        break;
-//                    }
-//                }
-//            }
-//            if (isClick){
-//                List<WebElement> elementsLast = chromeDriver.findElements(By.xpath("//div[@class='ant-list category-list ant-list-vertical ant-list-split']"));
-//                if (count<3) {
-//                    if (elements.size() == elementsLast.size()) {
-//                        return false;
-//                    } else {
-//                        System.out.println(level+"yyy");
-//                        return true;
-//                    }
-//                }else {
-//                    return true;
-//                }
-//            }else {
-//                return false;
-//            }
-//        }
-//        return false;
-//    }
-
     public void analyGood(ChromeDriver chromeDriver,GoodVo goodVo) throws InterruptedException {
         Good good = goodVo.getGood();
         List<GoodAttribute> attributes = goodVo.getAttributes();
@@ -159,8 +100,22 @@ public class MagicServiceImpl implements MagicService {
             pinAtts.remove(yun.get());
             pinAtts.add(yun.get());
         }
+        if (!objects.contains("电商平台链接")){
+            GoodAttribute attribute = new GoodAttribute();
+            attribute.setAttributeKey("产地");
+            attribute.setAttributeValue("安徽省,合肥市,长丰县");
+            pinAtts.add(attribute);
+        }
+        if (!objects.contains("产品详情")){
+            GoodAttribute attribute = new GoodAttribute();
+            attribute.setAttributeKey("产品详情");
+            attribute.setAttributeValue("<img src=\"https://sitecdn.zcycdn.com/1062CM/349900/10008091317/20225/e544f24a-5161-416d-b0e8-ec5c6fb002eb\" _src=\"https://sitecdn.zcycdn.com/1062CM/349900/10008091317/20225/e544f24a-5161-416d-b0e8-ec5c6fb002eb\" alt=\"\">");
+            pinAtts.add(attribute);
+        }
         Set<String> imageSet = new HashSet<>();
         Integer ciShu = 0;
+        WebElement name = chromeDriver.findElement(By.id("name"));
+        name.sendKeys(good.getName());
         for (GoodAttribute attribute:pinAtts) {
             //写入商品标题
             String attributeKey = attribute.getAttributeKey();
@@ -206,9 +161,9 @@ public class MagicServiceImpl implements MagicService {
             }else if (attributeKey.equals("产品详情")){
                 fillingGoodDetail(chromeDriver,attribute.getAttributeValue());
             }else if (attributeKey.equals("运费模版")){
-                wat(chromeDriver, By.xpath("//label[title='运费模版']"));
-                WebElement elementByCssSelector = chromeDriver.findElementByXPath("//label[title='运费模版']");
-                WebElement element = elementByCssSelector.findElement(By.xpath("../following-sibling::div"));
+                WebElement id = chromeDriver.findElement(By.id("运费信息"));
+                //WebElement elementByCssSelector = chromeDriver.findElementByCssSelector("label[title='运费模版']");
+                WebElement element = id.findElement(By.xpath(".//div[@class='ant-form-item-control-wrapper']"));
                 fillingYunfei(element,chromeDriver);
             }
         }
@@ -217,8 +172,10 @@ public class MagicServiceImpl implements MagicService {
     private void fillingYunfei(WebElement element,ChromeDriver chromeDriver) {
         element.findElement(By.xpath(".//div[@class='ant-select-selection\n" +
                 "            ant-select-selection--single']")).click();
+        chromeDriver.executeScript("arguments[0].scrollIntoView();", element);
         List<WebElement> elements = chromeDriver.findElements(By.xpath("//ul[@class='ant-select-dropdown-menu  ant-select-dropdown-menu-root ant-select-dropdown-menu-vertical']"));
         WebElement elementDiv = elements.get(elements.size()-1);
+        wat(chromeDriver, elementDiv,By.xpath(".//li[@class='ant-select-dropdown-menu-item']"));
         List<WebElement> element2 = elementDiv.findElements(By.xpath(".//li[@class='ant-select-dropdown-menu-item']"));
         WebElement judgingElement = isJudgingElement(elementDiv, By.xpath(".//li[@class='ant-select-dropdown-menu-item ant-select-dropdown-menu-item-selected']"));
         WebElement judgingElementActive = isJudgingElement(elementDiv,By.xpath(".//li[@class='ant-select-dropdown-menu-item ant-select-dropdown-menu-item-active']"));
@@ -242,10 +199,8 @@ public class MagicServiceImpl implements MagicService {
 
 
     private void fillingGoodDetail(ChromeDriver chromeDriver, String attributeValue) {
-        WebElement elementByCssSelector = chromeDriver.findElementByCssSelector("label[title='产品详情']");
-        WebElement element = elementByCssSelector.findElement(By.xpath("../following-sibling::div"));
-        WebElement frame = element.findElement(By.xpath(".//iframe"));
-        frame.findElement(By.xpath(".//body/p")).sendKeys(attributeValue);
+        String js = "document.querySelector('#ueditor_0').contentDocument.querySelector('body').innerHTML='"+attributeValue+"'";
+        chromeDriver.executeScript(js);
     }
 
     private void fillingImage(ChromeDriver chromeDriver, GoodImage image, Set<String> imageSet,Integer count) {
@@ -350,6 +305,7 @@ public class MagicServiceImpl implements MagicService {
         List<String> list = Arrays.asList(productPlace.split(","));
         WebElement element1 = element.findElement(By.xpath(".//form"));
         WebElement element2 = element1.findElement(By.xpath(".//input[@class='ant-radio-input']"));
+        chromeDriver.executeScript("arguments[0].scrollIntoView(false);", element2);
         System.out.println(element2.getAttribute("class"));
         element2.click();
         WebElement element3 = element1.findElement(By.xpath(".//span[@class='zcy-tenant-addressCode-undefined ant-cascader-picker zcy-tenant-addressCode-undefined']"));
@@ -357,20 +313,25 @@ public class MagicServiceImpl implements MagicService {
         //todo
         wat(chromeDriver, By.xpath("//ul[@class='ant-cascader-menu']"));
         WebElement element4 = chromeDriver.findElements(By.xpath("//ul[@class='ant-cascader-menu']")).get(0);
+        wat(chromeDriver,element4,By.xpath(".//li"));
         List<WebElement> elements = element4.findElements(By.xpath(".//li"));
         for (WebElement webElement:elements){
             if (webElement.getAttribute("innerText").equals(list.get(0))){
                 webElement.click();
             }
         }
+        wat(chromeDriver, By.xpath("//ul[@class='ant-cascader-menu'][2]"));
         WebElement element5 = chromeDriver.findElements(By.xpath("//ul[@class='ant-cascader-menu']")).get(1);
+        wat(chromeDriver,element4,By.xpath(".//li"));
         List<WebElement> elements1 = element5.findElements(By.xpath(".//li"));
         for (WebElement webElement:elements1){
             if (webElement.getAttribute("innerText").equals(list.get(1))){
                 webElement.click();
             }
         }
+        wat(chromeDriver, By.xpath("//ul[@class='ant-cascader-menu'][3]"));
         WebElement element6 = chromeDriver.findElements(By.xpath("//ul[@class='ant-cascader-menu']")).get(2);
+        wat(chromeDriver,element4,By.xpath(".//li"));
         List<WebElement> elements2 = element6.findElements(By.xpath(".//li"));
         for (WebElement webElement:elements2){
             if (webElement.getAttribute("innerText").equals(list.get(1))){
@@ -387,7 +348,7 @@ public class MagicServiceImpl implements MagicService {
         wat(chromeDriver,By.xpath("//a[@class='attribute-add-button']"));
         WebElement elementA = chromeDriver.findElement(By.xpath("//a[@class='attribute-add-button']"));
         System.out.println(elementA.getAttribute("innerText"));
-        chromeDriver.executeScript("arguments[0].scrollIntoView();", elementA);
+        chromeDriver.executeScript("arguments[0].scrollIntoView(false);", elementA);
         elementA.click();
         wat(chromeDriver,By.xpath("//div[@class='ant-popover ant-popover-placement-bottom']"));
         WebElement elementBottom = chromeDriver.findElement(By.xpath("//div[@class='ant-popover ant-popover-placement-bottom']"));
@@ -490,6 +451,10 @@ public class MagicServiceImpl implements MagicService {
     public static void wat(ChromeDriver driver, By by) {
         new WebDriverWait(driver,3).until(
                 ExpectedConditions.presenceOfElementLocated(by));
+    }
+
+    public static void wat(ChromeDriver driver,WebElement webElement,By by){
+        new WebDriverWait(driver,3).until(ExpectedConditions.presenceOfNestedElementLocatedBy(webElement,by));
     }
 
     public void wait(ChromeDriver driver,By by){
