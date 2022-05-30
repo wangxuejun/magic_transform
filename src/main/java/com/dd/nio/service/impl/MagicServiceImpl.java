@@ -277,6 +277,7 @@ public class MagicServiceImpl implements MagicService {
         element.findElement(By.xpath(".//div[@class='ant-select-selection\n" +
                 "            ant-select-selection--single']")).click();
         WebElement elementDiv = chromeDriver.findElements(By.xpath("//ul[@class='ant-select-dropdown-menu  ant-select-dropdown-menu-root ant-select-dropdown-menu-vertical']")).get(1);
+        wat(chromeDriver, By.xpath("//li[@class='ant-select-dropdown-menu-item ant-select-dropdown-menu-item-disabled']"));
         List<WebElement> element2 = elementDiv.findElements(By.xpath(".//li[@class='ant-select-dropdown-menu-item']"));
         WebElement judgingElement = isJudgingElement(elementDiv, By.xpath(".//li[@class='ant-select-dropdown-menu-item ant-select-dropdown-menu-item-selected']"));
         WebElement judgingElementActive = isJudgingElement(elementDiv,By.xpath(".//li[@class='ant-select-dropdown-menu-item ant-select-dropdown-menu-item-active']"));
@@ -305,7 +306,6 @@ public class MagicServiceImpl implements MagicService {
         WebElement elementDiv = chromeDriver.findElements(By.xpath("//ul[@class='ant-select-dropdown-menu  ant-select-dropdown-menu-root ant-select-dropdown-menu-vertical']")).get(0);
         wat(chromeDriver, By.xpath("//li[@class='ant-select-dropdown-menu-item']/div/div/span[@class='brand-item-name']"));
         List<WebElement> element2 = elementDiv.findElements(By.xpath(".//li[@class='ant-select-dropdown-menu-item']"));
-
         WebElement judgingElement = isJudgingElement(elementDiv, By.xpath(".//li[@class='ant-select-dropdown-menu-item ant-select-dropdown-menu-item-selected']"));
         WebElement judgingElementActive = isJudgingElement(elementDiv,By.xpath(".//li[@class='ant-select-dropdown-menu-item ant-select-dropdown-menu-item-active']"));
         WebElement judgingElementActiveSelect = isJudgingElement(elementDiv,By.xpath(".//li[@class='ant-select-dropdown-menu-item ant-select-dropdown-menu-item-active ant-select-dropdown-menu-item-selected']"));
@@ -383,7 +383,11 @@ public class MagicServiceImpl implements MagicService {
         //查询勾选的checkbox 的index
         WebElement elementGui = chromeDriver.findElement(By.xpath("//span[text()='销售规格']"));
         WebElement elementImage = elementGui.findElement(By.xpath("../following-sibling::form"));
-        WebElement elementA = elementImage.findElement(By.xpath(".//a[text()='点击添加']"));
+        System.out.println(elementImage.getAttribute("class"));
+        wat(chromeDriver,By.xpath("//a[@class='attribute-add-button']"));
+        WebElement elementA = chromeDriver.findElement(By.xpath("//a[@class='attribute-add-button']"));
+        System.out.println(elementA.getAttribute("innerText"));
+        chromeDriver.executeScript("arguments[0].scrollIntoView();", elementA);
         elementA.click();
         wat(chromeDriver,By.xpath("//div[@class='ant-popover ant-popover-placement-bottom']"));
         WebElement elementBottom = chromeDriver.findElement(By.xpath("//div[@class='ant-popover ant-popover-placement-bottom']"));
@@ -537,7 +541,7 @@ public class MagicServiceImpl implements MagicService {
             httpUrl = (HttpURLConnection) url.openConnection();
             httpUrl.connect();
             bis = new BufferedInputStream(httpUrl.getInputStream());
-            path = "/Users/ye.li3/Desktop/images/"+s+".png";
+            path = "/Users/tao.wang15/Desktop/magic_transform/src/main/resources/"+s+".png";
             byte[] streamBytes = getStreamBytes(bis);
             byte[] bytes = PicUtils.compressPicForScale(streamBytes, 100);
             fileToBytes(bytes,path);
