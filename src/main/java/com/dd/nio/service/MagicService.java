@@ -1,6 +1,8 @@
 package com.dd.nio.service;
 
+import com.dd.nio.common.response.ResultData;
+
 public interface MagicService {
 
-    void fillingGoods() throws InterruptedException;
+    ResultData fillingGoods() throws InterruptedException;
 }

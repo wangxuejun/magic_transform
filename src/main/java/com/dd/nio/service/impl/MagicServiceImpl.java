@@ -1,6 +1,7 @@
 package com.dd.nio.service.impl;
 
 import com.dd.nio.common.operate.ChromeOperator;
+import com.dd.nio.common.response.ResultData;
 import com.dd.nio.common.utils.PicUtils;
 import com.dd.nio.entity.Good;
 import com.dd.nio.entity.GoodAttribute;
@@ -55,7 +56,7 @@ public class MagicServiceImpl implements MagicService {
 
 
     @Override
-    public void fillingGoods() throws InterruptedException {
+    public ResultData fillingGoods() throws InterruptedException {
         ChromeDriver chromeDriver = chromeOperator.getChromeDriver();
         List<GoodVo> pageGoods = goodService.getPageGoods();
         Thread.sleep(1000);
@@ -70,9 +71,10 @@ public class MagicServiceImpl implements MagicService {
                 goodService.deleteGood(goodVo.getGood());
             }
         }
+        return ResultData.success();
     }
 
-    public void analyGood(ChromeDriver chromeDriver,GoodVo goodVo) throws InterruptedException {
+    public void analyGood(ChromeDriver chromeDriver,GoodVo goodVo) {
         Good good = goodVo.getGood();
         List<GoodAttribute> attributes = goodVo.getAttributes();
         Set<String> objects = Sets.newHashSet();
@@ -102,8 +104,8 @@ public class MagicServiceImpl implements MagicService {
         }
         if (!objects.contains("电商平台链接")){
             GoodAttribute attribute = new GoodAttribute();
-            attribute.setAttributeKey("产地");
-            attribute.setAttributeValue("安徽省,合肥市,长丰县");
+            attribute.setAttributeKey("电商平台链接");
+            attribute.setAttributeValue("http://ss");
             pinAtts.add(attribute);
         }
         if (!objects.contains("产品详情")){

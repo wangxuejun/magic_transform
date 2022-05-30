@@ -136,6 +136,12 @@
       <version>0.4.8</version>
     </dependency>
 
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt</artifactId>
+      <version>0.9.1</version>
+    </dependency>
+
     <!-- Swagger API文档 -->
     <dependency>
       <groupId>io.springfox</groupId>

@@ -36,7 +36,7 @@ public class GoodServiceImpl extends ServiceImpl<GoodMapper, Good> implements IG
     @Override
     public List<GoodVo> getPageGoods() {
         List<GoodVo> res = Lists.newArrayList();
-        Page<Good> goodPage = goodMapper.selectPage(new Page<>(1, 1), new LambdaQueryWrapper<Good>()
+        Page<Good> goodPage = goodMapper.selectPage(new Page<>(1, 50), new LambdaQueryWrapper<Good>()
                 .eq(Good::getIsEffect,1));
         List<Good> records = goodPage.getRecords();
         records.stream().forEach(record -> {
