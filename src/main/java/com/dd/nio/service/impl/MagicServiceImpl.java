@@ -17,6 +17,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +63,14 @@ public class MagicServiceImpl implements MagicService {
             throw new ServiceException("查无此用户");
         }
         System.setProperty("webdriver.chrome.driver",chromeDriverPath);
-        ChromeDriver chromeDriver = new ChromeDriver();
+        ChromeOptions chromeOptions = new ChromeOptions();
+        chromeOptions.addArguments("--headless");
+        chromeOptions.addArguments("--disable-gpu");//谷歌文档提到需要加上这个属性来规避bug
+        chromeOptions.addArguments("--no-sandbox");// “–no - sandbox”参数是让Chrome在root权限下跑
+        chromeOptions.addArguments("--disable-dev-shm-usage");
+        chromeOptions.addArguments("lang=zh_CN.UTF-8");
+        chromeOptions.addArguments("window-size=1920x1080");
+        ChromeDriver chromeDriver = new ChromeDriver(chromeOptions);
         chromeDriver.get("https://login.anhui.zcygov.cn/user-login/#/");
         wat(chromeDriver,By.id("username"));
         chromeDriver.findElement(By.id("username")).sendKeys(user.getShopUsername());

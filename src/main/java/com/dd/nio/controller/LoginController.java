@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Api(tags = "user")
 @RestController
-@RequestMapping("/magic/user")
+@RequestMapping("magic/user")
 public class LoginController {
 
     @Autowired
@@ -38,7 +38,7 @@ public class LoginController {
     }
 
     @ApiOperation(value = "用户列表")
-    @RequestMapping(value = "/list",method = RequestMethod.POST,name="admin")
+    @RequestMapping(value = "/list",method = RequestMethod.GET,name="admin")
     public ResultData list(){
         return iUserService.listUser();
     }

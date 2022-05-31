@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Api(tags = "tran")
 @RestController
-@RequestMapping("/magic/transform")
+@RequestMapping("magic/transform")
 public class MagicController {
 
     @Autowired
