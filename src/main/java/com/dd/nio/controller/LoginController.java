@@ -39,8 +39,9 @@ public class LoginController {
 
     @ApiOperation(value = "用户列表")
     @RequestMapping(value = "/list",method = RequestMethod.GET,name="admin")
-    public ResultData list(){
-        return iUserService.listUser();
+    public ResultData list(@RequestParam("page_no") Integer pageNo,
+                           @RequestParam("page_size") Integer pageSize){
+        return iUserService.listUser(pageNo,pageSize);
     }
 
 }

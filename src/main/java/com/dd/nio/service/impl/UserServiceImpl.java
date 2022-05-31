@@ -1,6 +1,7 @@
 package com.dd.nio.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dd.nio.common.exception.ServiceException;
 import com.dd.nio.common.response.ResultData;
 import com.dd.nio.common.utils.JwtUtils;
@@ -60,9 +61,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public ResultData listUser() {
-        List<User> users = userMapper.selectList(new LambdaQueryWrapper<User>());
-        return ResultData.success(users);
+    public ResultData listUser(Integer pageNo,Integer pageeSize) {
+        Page<User> userPage = userMapper.selectPage(new Page<User>(pageNo, pageeSize), new LambdaQueryWrapper<User>());
+        if (!userPage.getRecords().isEmpty()) {
+            return ResultData.success(userPage.getRecords());
+        }
+        throw new ServiceException("无用户");
     }
 
     @Override

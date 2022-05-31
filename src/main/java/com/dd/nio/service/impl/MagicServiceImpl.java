@@ -82,7 +82,6 @@ public class MagicServiceImpl implements MagicService {
             try {
                 analyGood(chromeDriver,goodVo);
                 goodService.complete(goodVo.getGood());
-                Thread.sleep(1000);
             }catch (Exception e){
                 log.error(e.getMessage());
                 log.error(goodVo.getGood().getName());
