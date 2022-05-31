@@ -44,4 +44,10 @@ public class LoginController {
         return iUserService.listUser(pageNo,pageSize);
     }
 
+    @ApiOperation(value = "用户删除")
+    @RequestMapping(value = "/delete",method =RequestMethod.GET,name="admin")
+    public ResultData del(@RequestParam(value = "user_id")Integer userId){
+        return iUserService.del(userId);
+    }
+
 }

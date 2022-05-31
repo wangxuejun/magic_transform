@@ -65,7 +65,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public ResultData listUser(Integer pageNo,Integer pageSize) {
         Page<User> userPage = userMapper.selectPage(new Page<User>(pageNo, pageSize), new LambdaQueryWrapper<User>());
         if (!userPage.getRecords().isEmpty()) {
-            return ResultData.success(userPage.getRecords());
+            HashMap<String, Object> hashMap = Maps.newHashMap();
+            hashMap.put("users",userPage.getRecords());
+            hashMap.put("total",userPage.getTotal());
+            return ResultData.success(hashMap);
         }
         throw new ServiceException("无用户");
     }
@@ -83,6 +86,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             throw new ServiceException("用户名重复");
         }
         userMapper.insert(user);
+        return ResultData.success();
+    }
+
+    @Override
+    public ResultData del(Integer userId) {
+        userMapper.deleteById(userId);
         return ResultData.success();
     }
 

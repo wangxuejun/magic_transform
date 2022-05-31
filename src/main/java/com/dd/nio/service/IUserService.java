@@ -21,4 +21,6 @@ public interface IUserService extends IService<User> {
     ResultData updateUser(User user);
 
     ResultData addUser(User user);
+
+    ResultData del(Integer userId);
 }

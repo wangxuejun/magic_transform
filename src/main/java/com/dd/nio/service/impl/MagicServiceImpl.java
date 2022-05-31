@@ -474,12 +474,12 @@ public class MagicServiceImpl implements MagicService {
     }
 
     public static void wat(ChromeDriver driver, By by) {
-        new WebDriverWait(driver,3).until(
+        new WebDriverWait(driver,10).until(
                 ExpectedConditions.presenceOfElementLocated(by));
     }
 
     public static void wat(ChromeDriver driver,WebElement webElement,By by){
-        new WebDriverWait(driver,3).until(ExpectedConditions.presenceOfNestedElementLocatedBy(webElement,by));
+        new WebDriverWait(driver,10).until(ExpectedConditions.presenceOfNestedElementLocatedBy(webElement,by));
     }
 
     public void wait(ChromeDriver driver,By by){
