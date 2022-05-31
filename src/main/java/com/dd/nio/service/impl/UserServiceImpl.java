@@ -55,14 +55,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             HashMap<String, Object> hashMap1 = new HashMap<>();
             hashMap1.put("jwt",jwt);
             hashMap1.put("user_id",user.getId());
+            hashMap1.put("role",user.getUserRole());
             return ResultData.success(hashMap1);
         }
         return ResultData.fail(401,"登陆失败");
     }
 
     @Override
-    public ResultData listUser(Integer pageNo,Integer pageeSize) {
-        Page<User> userPage = userMapper.selectPage(new Page<User>(pageNo, pageeSize), new LambdaQueryWrapper<User>());
+    public ResultData listUser(Integer pageNo,Integer pageSize) {
+        Page<User> userPage = userMapper.selectPage(new Page<User>(pageNo, pageSize), new LambdaQueryWrapper<User>());
         if (!userPage.getRecords().isEmpty()) {
             return ResultData.success(userPage.getRecords());
         }

@@ -189,11 +189,8 @@ public class MagicServiceImpl implements MagicService {
         chromeDriver.executeScript("arguments[0].scrollIntoView(false);", button);
         System.out.println("button======"+button.getAttribute("class"));
         button.click();
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        wat(chromeDriver, By.xpath("//div[@class='zcy-breadcrumb-content zcy-breadcrumb-fixed clearfix']/.//button[@class='ant-btn ant-btn-primary ant-btn-loading']"));
+        wat(chromeDriver, By.xpath("//div[@class='zcy-breadcrumb-content zcy-breadcrumb-fixed clearfix']/.//button[@class='ant-btn ant-btn-primary']"));
     }
 
     private void fillingYunfei(WebElement element,ChromeDriver chromeDriver) {
