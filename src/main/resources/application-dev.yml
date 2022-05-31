@@ -80,7 +80,7 @@ spring:
         connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
       datasource:
         master:
-          url: jdbc:mysql://47.114.110.56:3306/magic_transform?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+          url: jdbc:mysql://127.0.0.1:3306/magic_transform?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
           username: root
           password: hUgxBp6K8l7Bd4KVq12^
           driver-class-name: com.mysql.cj.jdbc.Driver
@@ -116,10 +116,10 @@ swagger:
 #chrome
 chrome:
   driver:
-    path: src/main/resources/chromedriver
+    path: /app/conf/chromedriver
 jwt:
   header: Authorization
   tokenSecret: qazxswedcvfrtgbnhyujmkiolp #密钥
-  tokenExpired: 3600000 #token过期时间(30分钟)
+  tokenExpired: 7200000 #token过期时间(30分钟)
 
 

@@ -1,7 +1,6 @@
 package com.dd.nio.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dd.nio.entity.Good;
 import com.dd.nio.entity.GoodAttribute;
 import com.dd.nio.entity.vo.GoodVo;
@@ -36,10 +35,9 @@ public class GoodServiceImpl extends ServiceImpl<GoodMapper, Good> implements IG
     @Override
     public List<GoodVo> getPageGoods() {
         List<GoodVo> res = Lists.newArrayList();
-        Page<Good> goodPage = goodMapper.selectPage(new Page<>(1, 50), new LambdaQueryWrapper<Good>()
-                .eq(Good::getIsEffect,1));
-        List<Good> records = goodPage.getRecords();
-        records.stream().forEach(record -> {
+        List<Good> goods = goodMapper.selectList(new LambdaQueryWrapper<Good>()
+                .eq(Good::getIsEffect, 1));
+        goods.stream().forEach(record -> {
             List<GoodAttribute> list = goodAttributeService.list(new LambdaQueryWrapper<GoodAttribute>().eq(GoodAttribute::getGoodId, record.getId()));
             GoodVo goodVo = new GoodVo();
             goodVo.setGood(record);
@@ -53,6 +51,17 @@ public class GoodServiceImpl extends ServiceImpl<GoodMapper, Good> implements IG
     public void deleteGood(Good good) {
         good.setIsEffect(0);
         goodMapper.updateById(good);
+    }
+
+    @Override
+    public void complete(Good good) {
+        goodMapper.deleteById(good);
+    }
+
+    @Override
+    public Integer getWriteCount() {
+        Integer integer = goodMapper.selectCount(new LambdaQueryWrapper<Good>().eq(Good::getIsEffect, 1));
+        return integer;
     }
 
 }

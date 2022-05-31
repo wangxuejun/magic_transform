@@ -46,14 +46,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
                 .eq(User::getUserName, userName)
                 .eq(User::getPassword, password)
-                .le(User::getExprTime, TimeUtils.dateToString(new Date())));
+                .ge(User::getExprTime, TimeUtils.dateToString(new Date())));
         if (Objects.nonNull(user)){
             HashMap<String, Object> hashMap = Maps.newHashMap();
             hashMap.put("roles",user.getUserRole());
             String jwt = JwtUtils.createJwt(user.getId().toString(), userName, hashMap);
             return ResultData.success(jwt);
         }
-        return ResultData.fail(400,"登陆失败");
+        return ResultData.fail(401,"登陆失败");
     }
 
     @Override
@@ -70,6 +70,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public ResultData addUser(User user) {
+        List<User> users = userMapper.selectList(new LambdaQueryWrapper<User>().eq(User::getUserName, user.getUserName()));
+        if (!users.isEmpty()){
+            throw new ServiceException("用户名重复");
+        }
         userMapper.insert(user);
         return ResultData.success();
     }

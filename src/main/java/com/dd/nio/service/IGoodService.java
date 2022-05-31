@@ -20,4 +20,7 @@ public interface IGoodService extends IService<Good> {
 
     void deleteGood(Good good);
 
+    void complete(Good good);
+
+    Integer getWriteCount();
 }

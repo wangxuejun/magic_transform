@@ -1,39 +1,33 @@
 package com.dd.nio.service.impl;
 
+import com.dd.nio.common.exception.ServiceException;
 import com.dd.nio.common.operate.ChromeOperator;
 import com.dd.nio.common.response.ResultData;
 import com.dd.nio.common.utils.PicUtils;
-import com.dd.nio.entity.Good;
-import com.dd.nio.entity.GoodAttribute;
-import com.dd.nio.entity.GoodImage;
-import com.dd.nio.entity.GoodPrice;
+import com.dd.nio.entity.*;
 import com.dd.nio.entity.vo.AttributeTypeVo;
 import com.dd.nio.entity.vo.GoodVo;
+import com.dd.nio.mapper.UserMapper;
 import com.dd.nio.service.*;
 import com.google.common.collect.Sets;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.FluentWait;
-import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.sql.Blob;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
 
 @Slf4j
 @Service
@@ -43,27 +37,44 @@ public class MagicServiceImpl implements MagicService {
     private IGoodService goodService;
 
     @Autowired
-    private ChromeOperator chromeOperator;
-
-    @Autowired
+    @SuppressWarnings("all")
     private IAttributeTypeService iAttributeTypeService;
 
     @Autowired
+    @SuppressWarnings("all")
     private IGoodPriceService iGoodPriceService;
 
     @Autowired
+    @SuppressWarnings("all")
     private IGoodImageService iGoodImageService;
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Value("${chrome.driver.path}")
+    private String chromeDriverPath;
 
 
     @Override
-    public ResultData fillingGoods() throws InterruptedException {
-        ChromeDriver chromeDriver = chromeOperator.getChromeDriver();
+    public ResultData fillingGoods(Long userId) {
+        User user = userMapper.selectById(userId);
+        if (Objects.isNull(user)){
+            throw new ServiceException("查无此用户");
+        }
+        System.setProperty("webdriver.chrome.driver",chromeDriverPath);
+        ChromeDriver chromeDriver = new ChromeDriver();
+        chromeDriver.get("https://login.anhui.zcygov.cn/user-login/#/");
+        wat(chromeDriver,By.id("username"));
+        chromeDriver.findElement(By.id("username")).sendKeys(user.getShopUsername());
+        chromeDriver.findElement(By.id("password")).sendKeys(user.getShopPassword());
+        chromeDriver.findElementByCssSelector(".ant-btn.login-btn.password-login.ant-btn-primary").click();
         List<GoodVo> pageGoods = goodService.getPageGoods();
-        Thread.sleep(1000);
         for (GoodVo goodVo:pageGoods) {
             chromeDriver.get("https://www.anhui.zcygov.cn/item-center-front/publishgoods/publish?categoryId=5984&protocolId=1028&bidId=80&instanceCode=AHWC");
             try {
                 analyGood(chromeDriver,goodVo);
+                goodService.complete(goodVo.getGood());
+                Thread.sleep(1000);
             }catch (Exception e){
                 log.error(e.getMessage());
                 log.error(goodVo.getGood().getName());
@@ -71,8 +82,15 @@ public class MagicServiceImpl implements MagicService {
                 goodService.deleteGood(goodVo.getGood());
             }
         }
+        chromeDriver.close();
         return ResultData.success();
     }
+
+    @Override
+    public ResultData getWrite() {
+        return ResultData.success(goodService.getWriteCount());
+    }
+
 
     public void analyGood(ChromeDriver chromeDriver,GoodVo goodVo) {
         Good good = goodVo.getGood();
@@ -101,18 +119,6 @@ public class MagicServiceImpl implements MagicService {
         }else {
             pinAtts.remove(yun.get());
             pinAtts.add(yun.get());
-        }
-        if (!objects.contains("电商平台链接")){
-            GoodAttribute attribute = new GoodAttribute();
-            attribute.setAttributeKey("电商平台链接");
-            attribute.setAttributeValue("http://ss");
-            pinAtts.add(attribute);
-        }
-        if (!objects.contains("产品详情")){
-            GoodAttribute attribute = new GoodAttribute();
-            attribute.setAttributeKey("产品详情");
-            attribute.setAttributeValue("<img src=\"https://sitecdn.zcycdn.com/1062CM/349900/10008091317/20225/e544f24a-5161-416d-b0e8-ec5c6fb002eb\" _src=\"https://sitecdn.zcycdn.com/1062CM/349900/10008091317/20225/e544f24a-5161-416d-b0e8-ec5c6fb002eb\" alt=\"\">");
-            pinAtts.add(attribute);
         }
         Set<String> imageSet = new HashSet<>();
         Integer ciShu = 0;
@@ -153,7 +159,8 @@ public class MagicServiceImpl implements MagicService {
                 fillingAnZhuang(element,attribute.getAttributeValue(),chromeDriver);
             }else if (attributeKey.equals("规格")){
                 AttributeTypeVo attributeVo = iAttributeTypeService.getAttributeVo(Long.valueOf(attribute.getAttributeValue()));
-                fillingGoodAttribute(chromeDriver,attributeVo.getAttributeType().getType(),attributeVo,imageSet);
+                String s = attributeVo.getAttributeType().getType();
+                fillingGoodAttribute(chromeDriver,s.substring(0, s.length() - 1),attributeVo,imageSet);
             }else if (attributeKey.equals("价格")){
                 GoodPrice byId = iGoodPriceService.getById(Long.valueOf(attribute.getAttributeValue()));
                 filingPrice(chromeDriver,byId);
@@ -161,7 +168,7 @@ public class MagicServiceImpl implements MagicService {
                 GoodImage byId = iGoodImageService.getById(Long.valueOf(attribute.getAttributeValue()));
                 fillingImage(chromeDriver,byId, imageSet, ciShu);
                 ciShu ++ ;
-            }else if (attributeKey.equals("产品详情")){
+            }else if (attributeKey.equals("商品详情")){
                 fillingGoodDetail(chromeDriver,attribute.getAttributeValue());
             }else if (attributeKey.equals("运费模版")){
                 WebElement id = chromeDriver.findElement(By.id("运费信息"));
@@ -169,6 +176,16 @@ public class MagicServiceImpl implements MagicService {
                 WebElement element = id.findElement(By.xpath(".//div[@class='ant-form-item-control-wrapper']"));
                 fillingYunfei(element,chromeDriver);
             }
+        }
+        WebElement element = chromeDriver.findElement(By.xpath("//div[@class='zcy-breadcrumb-content zcy-breadcrumb-fixed clearfix']"));
+        WebElement button = element.findElement(By.xpath(".//button[@class='ant-btn ant-btn-primary']"));
+        chromeDriver.executeScript("arguments[0].scrollIntoView(false);", button);
+        System.out.println("button======"+button.getAttribute("class"));
+        button.click();
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
@@ -202,8 +219,13 @@ public class MagicServiceImpl implements MagicService {
 
 
     private void fillingGoodDetail(ChromeDriver chromeDriver, String attributeValue) {
-        String js = "document.querySelector('#ueditor_0').contentDocument.querySelector('body').innerHTML='"+attributeValue+"'";
+        String s = deleteN(attributeValue);
+        String js = "document.querySelector('#ueditor_0').contentDocument.querySelector('body').innerHTML='"+s+"'";
         chromeDriver.executeScript(js);
+        WebElement element = chromeDriver.findElement(By.xpath("//iframe"));
+        chromeDriver.switchTo().frame("ueditor_0");
+        chromeDriver.findElement(By.xpath("./html/body")).sendKeys(Keys.ENTER);
+        chromeDriver.switchTo().defaultContent();
     }
 
     private void fillingImage(ChromeDriver chromeDriver, GoodImage image, Set<String> imageSet,Integer count) {
@@ -213,6 +235,11 @@ public class MagicServiceImpl implements MagicService {
         waitClick(chromeDriver,webElement.findElement(By.xpath(".//div[@class='image-box']")));
         webElement.findElement(By.xpath(".//div[@class='image-box']")).click();
         upload(chromeDriver, image.getImageUrl(), imageSet,"产品图片");
+        try {
+            Thread.sleep(500);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private void filingPrice(ChromeDriver chromeDriver, GoodPrice price) {
@@ -224,7 +251,7 @@ public class MagicServiceImpl implements MagicService {
                 elements.get(i).sendKeys(price.getMarketPrice().toString());
             }
             if (i==1){
-                elements.get(i).sendKeys(price.getChannelPrice().toString());
+                elements.get(i).sendKeys(price.getAgreementPrice().toString());
             }
         }
         WebElement elementStock = element.findElement(By.xpath(".//td[@class='stockQuantity ant-table-row-cell-break-word']"));
@@ -384,13 +411,15 @@ public class MagicServiceImpl implements MagicService {
                         elements.get(i).sendKeys(attributeVo.getGoodPrice().getMarketPrice().toString());
                     }
                     if (i==1){
-                        elements.get(i).sendKeys(attributeVo.getGoodPrice().getChannelPrice().toString());
+                        elements.get(i).sendKeys(attributeVo.getGoodPrice().getAgreementPrice().toString());
                     }
                 }
                 WebElement elementStock = element.findElement(By.xpath(".//td[@class='stockQuantity ant-table-row-cell-break-word']"));
                 String stock = "";
                 if (Objects.isNull(attributeVo.getGoodPrice().getStock())){
                     stock = "1000";
+                }else {
+                    stock = attributeVo.getGoodPrice().getStock().toString();
                 }
                 elementStock.findElement(By.xpath(".//input")).sendKeys(stock);
             }
@@ -408,22 +437,12 @@ public class MagicServiceImpl implements MagicService {
         wat(chromeDriver, By.xpath(inputFile));
         WebElement element = chromeDriver.findElement(By.xpath(inputFile));
         element.sendKeys(path);
-        try {
-            Thread.sleep(3000);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
         WebElement elementDiv = chromeDriver.findElements(By.xpath("//div[@class='ant-modal-content']")).get(count);
         WebElement elementImageDiv = elementDiv.findElement(By.xpath(".//div[@class='img-border']"));
         List<WebElement> elements = elementImageDiv.findElements(By.xpath(".//img[@class='img']"));
         elements.get(0).click();
         WebElement elementFoot = elementDiv.findElement(By.xpath(".//div[@class='ant-modal-footer']"));
         elementFoot.findElement(By.xpath(".//button[@class='ant-btn ant-btn-primary']")).click();
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         deleteImage(path);
     }
 
@@ -492,6 +511,16 @@ public class MagicServiceImpl implements MagicService {
         return attributes;
     }
 
+    public String deleteN(String str){
+        if (str.contains("\n")){
+            int i = str.indexOf("\n");
+            StringBuffer stringBuffer = new StringBuffer(str);
+            stringBuffer.deleteCharAt(i);
+            return stringBuffer.toString();
+        }
+        return str;
+    }
+
     @SneakyThrows
     public String saveToFile(String destUrl) {
         FileOutputStream fos = null;
@@ -508,7 +537,7 @@ public class MagicServiceImpl implements MagicService {
             httpUrl = (HttpURLConnection) url.openConnection();
             httpUrl.connect();
             bis = new BufferedInputStream(httpUrl.getInputStream());
-            path = "/Users/ye.li3/PycharmProjects/magic_transform/src/main/resources/"+s+".png";
+            path = "/app/image/"+s+".png";
             byte[] streamBytes = getStreamBytes(bis);
             byte[] bytes = PicUtils.compressPicForScale(streamBytes, 100);
             fileToBytes(bytes,path);
