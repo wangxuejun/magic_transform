@@ -51,7 +51,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             HashMap<String, Object> hashMap = Maps.newHashMap();
             hashMap.put("roles",user.getUserRole());
             String jwt = JwtUtils.createJwt(user.getId().toString(), userName, hashMap);
-            return ResultData.success(jwt);
+            HashMap<String, Object> hashMap1 = new HashMap<>();
+            hashMap1.put("jwt",jwt);
+            hashMap1.put("user_id",user.getId());
+            return ResultData.success(hashMap1);
         }
         return ResultData.fail(401,"登陆失败");
     }
