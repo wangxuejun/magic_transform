@@ -49,13 +49,13 @@ export function setWrite(params, callback) {
 }
 // 提交爬虫
 export function setShopUrl(params, callback) {
-  http(config(SHOPSET, params, "POST", true, true)).then((res) =>
+  http(config(SHOPSET, params, "POST", true, false)).then((res) =>
     cb(res, callback)
   );
 }
 // 爬虫状态
 export function getShopStatue(params, callback) {
-  http(config(SHOP, params, "GET", true, true)).then((res) =>
+  http(config(SHOP, params, "GET", true, false)).then((res) =>
     cb(res, callback)
   );
 }

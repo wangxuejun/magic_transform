@@ -14,7 +14,7 @@ let http = axios.create({
     },
   ],
 });
-http.defaults.timeout = 15000;
+http.defaults.timeout = 25000;
 http.interceptors.request.use(
   function (config) {
     let url = config.url;
