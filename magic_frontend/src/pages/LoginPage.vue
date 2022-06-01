@@ -26,7 +26,7 @@
 </template>
 <script>
 import { login } from "@/api";
-import { Message, MessageBox } from "element-ui";
+import { Message } from "element-ui";
 export default {
   data() {
     return {
@@ -53,30 +53,38 @@ export default {
       }
       login({ user_name, password }, (res) => {
         console.log("res", res);
-        let { jwt, user_id, role } = res.data.data;
-        if (role === "common") {
-          MessageBox({
+        let { data, code } = res.data;
+        if (code === 401) {
+          Message({
             type: "error",
             title: "提示",
-            message: "对不起，您无权进入系统！",
-            duration: 700,
+            message: "账号或密码错误！",
           });
           return;
         }
-        sessionStorage.setItem("user_name", user_name);
-        sessionStorage.setItem("user_id", user_id);
-        sessionStorage.setItem("role", role);
-        sessionStorage.setItem("Authorization", "Bearer" + jwt);
-        Message({
-          type: "success",
-          message: `您好,${user_name},欢迎进入！`,
-          duration: 700,
-        });
-        setTimeout(() => {
-          this.$router.push({
-            path: "/admin/userList",
+        if (code === 200) {
+          let { jwt, user_id, role } = data;
+          sessionStorage.setItem("user_name", user_name);
+          sessionStorage.setItem("user_id", user_id);
+          sessionStorage.setItem("role", role);
+          sessionStorage.setItem("Authorization", "Bearer" + jwt);
+          Message({
+            type: "success",
+            message: `您好,${user_name},欢迎进入！`,
+            duration: 700,
           });
-        }, 700);
+          setTimeout(() => {
+            if (role === "admin") {
+              this.$router.push({
+                path: "/admin/userList",
+              });
+            } else {
+              this.$router.push({
+                path: "/admin/userShop",
+              });
+            }
+          }, 700);
+        }
       });
     },
   },

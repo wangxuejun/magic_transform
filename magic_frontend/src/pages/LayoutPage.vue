@@ -18,9 +18,9 @@
             text-color="#fff"
             active-text-color="#ffd04b"
           >
-            <el-submenu index="user">
+            <el-submenu index="user" v-if="role === 'admin'">
               <template slot="title">
-                <i class="el-icon-menu"></i>
+                <i class="el-icon-user-solid"></i>
                 <span>用户管理</span>
               </template>
               <el-menu-item index="userList">
@@ -31,10 +31,11 @@
               <el-menu-item index="userEditor">
                 <span>添加用户</span>
               </el-menu-item>
-              <el-menu-item index="userShop">
-                <span>爬虫</span>
-              </el-menu-item>
             </el-submenu>
+            <el-menu-item index="userShop">
+              <i class="el-icon-cpu"></i>
+              <span>爬虫</span>
+            </el-menu-item>
           </el-menu>
         </el-aside>
         <el-container>
@@ -50,6 +51,7 @@ export default {
   data() {
     return {
       user_name: "",
+      role: "",
       current: "userList",
     };
   },
@@ -66,13 +68,16 @@ export default {
   },
   mounted() {
     let user_name = sessionStorage.getItem("user_name");
+    let role = sessionStorage.getItem("role");
     this.user_name = user_name;
+    this.role = role;
   },
   watch: {
     $route: {
       handler(n) {
         console.log("更新路由");
         let user_id = sessionStorage.getItem("user_id");
+        let role = sessionStorage.getItem("role");
         if (!user_id) {
           Message({
             type: "warning",
@@ -85,7 +90,20 @@ export default {
         }
         let { fullPath } = n;
         let path = fullPath.split("/");
-        this.current = path[path.length - 1];
+        let url = path[path.length - 1];
+        console.log("path", path);
+        if (role === "common" && (url === "userEditor" || url === "userList")) {
+          Message({
+            type: "warning",
+            message: "您无权访问该页面，已为您跳转到合适的页面！",
+          });
+          this.current = url;
+          this.$router.push({
+            path: "/admin/userShop",
+          });
+        } else {
+          this.current = url;
+        }
       },
       immediate: true,
     },

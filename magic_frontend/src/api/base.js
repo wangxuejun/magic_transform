@@ -1,9 +1,9 @@
 let BASE, SHOP, SHOPSET;
 switch (process.env.NODE_ENV) {
   case "production":
-    BASE = "http://127.0.0.1/magic_transform/magic/";
-    SHOP = "https://mall.anhui.zcygov.cn/spider-status/";
-    SHOPSET = "https://mall.anhui.zcygov.cn/run-spider/";
+    BASE = "http://47.114.110.56:7777/magic_transform/magic/";
+    SHOP = "http://47.114.110.56:8082/spider-status/";
+    SHOPSET = "http://47.114.110.56:8082/run-spider/";
     break;
   default:
     BASE = "/magic_transform/magic/";

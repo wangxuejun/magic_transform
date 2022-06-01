@@ -33,7 +33,6 @@ http.interceptors.request.use(
     config.url = url;
     if (config.setAuthor) {
       let Authorization = sessionStorage.getItem("Authorization");
-      console.log("Authorization", Authorization);
       config.headers.Authorization = Authorization;
     }
     if (!config.showLoading && config.loading) {
@@ -56,12 +55,13 @@ http.interceptors.response.use(
       // 没有状态直接返回
       return response;
     }
-    if (code === 200) {
+    let codes = [200, 401];
+    if (codes.indexOf(code) >= 0) {
       return response;
     } else {
       if (response.config.loading) {
         Message({
-          message: response.data.errmsg,
+          message: "请求错误",
           type: "error",
         });
       }
@@ -74,7 +74,6 @@ http.interceptors.response.use(
         message: "请求失败",
         type: "error",
       });
-      // router.push({ path: "/error" });
     }
     tryHideFullScreenLoading();
   }
