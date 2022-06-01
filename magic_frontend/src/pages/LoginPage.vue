@@ -54,14 +54,6 @@ export default {
       login({ user_name, password }, (res) => {
         console.log("res", res);
         let { data, code } = res.data;
-        if (code === 401) {
-          Message({
-            type: "error",
-            title: "提示",
-            message: "账号或密码错误！",
-          });
-          return;
-        }
         if (code === 200) {
           let { jwt, user_id, role } = data;
           sessionStorage.setItem("user_name", user_name);

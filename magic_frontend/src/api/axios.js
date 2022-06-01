@@ -55,13 +55,13 @@ http.interceptors.response.use(
       // 没有状态直接返回
       return response;
     }
-    let codes = [200, 401];
+    let codes = [200];
     if (codes.indexOf(code) >= 0) {
       return response;
     } else {
       if (response.config.loading) {
         Message({
-          message: "请求错误",
+          message: response.data.message,
           type: "error",
         });
       }
